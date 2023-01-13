@@ -48,12 +48,7 @@ func ConfigHandler() Config {
 			panic("Не удалось прочитать конфиг файл, запустите программу снова")
 		}
 
-		var isGenerateNewConfig string
-
-		fmt.Println("Использовать ли сохраненные настройки? (Д - если использовать, Н если задать другое)")
-		fmt.Scanf("%s\n", &isGenerateNewConfig)
-
-		if !strings.Contains(isGenerateNewConfig, "Д") {
+		if !getTrueOrFalseFromConsole("Использовать ли сохраненные настройки? (Д - если использовать, Н если задать другое)") {
 			generateConfig(&configData)
 		}
 	} else {

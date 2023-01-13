@@ -75,7 +75,7 @@ func (c *CollectorPzMods) FullCopy(source string, target string) {
 		os.Mkdir(target, 0777)
 		d, err2 := ioutil.ReadDir(source)
 		if err2 != nil {
-			panic(1)
+			panic("Неудалось прочитать каталог: " + source)
 		}
 
 		for _, entry := range d {
@@ -84,19 +84,19 @@ func (c *CollectorPzMods) FullCopy(source string, target string) {
 	} else {
 		file, errFile := os.Open(source)
 		if errFile != nil {
-			panic(1)
+			panic("Неудалось открыть файл: " + source)
 		}
 		defer file.Close()
 
 		fileOut, errFileOut := os.Create(target)
 		if errFileOut != nil {
-			panic(1)
+			panic("Неудалось создать файл: " + target)
 		}
 		defer fileOut.Close()
 
 		_, errCopy := io.Copy(fileOut, file)
 		if errCopy != nil {
-			panic(1)
+			panic("Неудалось скопировать файл")
 		}
 
 	}
