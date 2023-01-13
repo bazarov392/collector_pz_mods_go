@@ -108,6 +108,7 @@ func generateConfig(configData *Config) {
 }
 
 func getTrueOrFalseFromConsole(message string) bool {
+	fmt.Println(message)
 	var result string
 	fmt.Scanf("%s\n", &result)
 
