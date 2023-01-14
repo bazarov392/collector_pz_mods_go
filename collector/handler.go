@@ -36,6 +36,7 @@ func (c *CollectorPzMods) GetWorkshopIds() {
 }
 
 func (c *CollectorPzMods) GetModIds() {
+	ch := make(chan string)
 	for _, workshopDir := range c.Params.WorkshopIds {
 		pathWorkshopDir := c.ConfigData.SteamDirMods + "/" + workshopDir
 
@@ -57,12 +58,28 @@ func (c *CollectorPzMods) GetModIds() {
 			stringModId = strings.Replace(stringModId, "id=", "", -1)
 			if !c.ContainsIgnoreModId(stringModId) {
 				c.Params.ModIds = append(c.Params.ModIds, stringModId)
+				fmt.Println("ModId " + stringModId + " добавлен в обработчик")
 				if c.ConfigData.CopyFiles {
-					c.FullCopy(pathDirMode, c.ConfigData.ResultDirMods+"/"+stringModId)
+					go c.CopyMode(pathDirMode, c.ConfigData.ResultDirMods+"/"+stringModId, stringModId, ch)
+					fmt.Println("ModId " + stringModId + " скопирован")
 				}
 			}
 		}
 	}
+
+	count := len(c.Params.ModIds)
+	for value := range ch {
+		fmt.Println(value + " скопирован!")
+		count -= 1
+		if count == 0 {
+			close(ch)
+		}
+	}
+}
+
+func (c *CollectorPzMods) CopyMode(source string, target string, modeName string, ch chan string) {
+	c.FullCopy(source, target)
+	ch <- modeName
 }
 
 func (c *CollectorPzMods) FullCopy(source string, target string) {
@@ -98,7 +115,6 @@ func (c *CollectorPzMods) FullCopy(source string, target string) {
 		if errCopy != nil {
 			panic("Неудалось скопировать файл")
 		}
-
 	}
 }
 
@@ -109,4 +125,21 @@ func (c *CollectorPzMods) ContainsIgnoreModId(s string) bool {
 		}
 	}
 	return false
+}
+
+func (c *CollectorPzMods) GenerateFileModAndWorkshopIds() {
+	infoFile, errInfoFile := os.Create("info.txt")
+	if errInfoFile != nil {
+		panic(errInfoFile)
+	}
+
+	var infoContent string
+	infoContent = "Mods=" + strings.Join(c.Params.ModIds, ";") + "\n"
+	infoContent += "Workshop=" + strings.Join(c.Params.WorkshopIds, ";") + "\n"
+	infoFile.WriteString(infoContent)
+
+	infoFile.Close()
+
+	fmt.Println("Информация записана в файл!")
+
 }

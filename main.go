@@ -17,4 +17,6 @@ func main() {
 
 	collect.GetWorkshopIds()
 	collect.GetModIds()
+	collect.GenerateFileModAndWorkshopIds()
+
 }
