@@ -74,6 +74,9 @@ func (c *CollectorPzMods) GetModIds() {
 }
 
 func (c *CollectorPzMods) CopyModes() {
+	if !c.ConfigData.CopyFiles {
+		return
+	}
 	infoChannel := make(chan string)
 
 	for _, modInfo := range c.Params.CopyInfo {
