@@ -17,6 +17,12 @@ type CollectorPzMods struct {
 type ResultParams struct {
 	WorkshopIds []string
 	ModIds      []string
+	CopyInfo    []ModInfo
+}
+
+type ModInfo struct {
+	PathMode string
+	ModId    string
 }
 
 func (c *CollectorPzMods) GetWorkshopIds() {
@@ -36,7 +42,6 @@ func (c *CollectorPzMods) GetWorkshopIds() {
 }
 
 func (c *CollectorPzMods) GetModIds() {
-	ch := make(chan string)
 	for _, workshopDir := range c.Params.WorkshopIds {
 		pathWorkshopDir := c.ConfigData.SteamDirMods + "/" + workshopDir
 
@@ -58,21 +63,31 @@ func (c *CollectorPzMods) GetModIds() {
 			stringModId = strings.Replace(stringModId, "id=", "", -1)
 			if !c.ContainsIgnoreModId(stringModId) {
 				c.Params.ModIds = append(c.Params.ModIds, stringModId)
+				c.Params.CopyInfo = append(c.Params.CopyInfo, ModInfo{
+					PathMode: pathDirMode,
+					ModId:    stringModId,
+				})
 				fmt.Println("ModId " + stringModId + " добавлен в обработчик")
-				if c.ConfigData.CopyFiles {
-					go c.CopyMode(pathDirMode, c.ConfigData.ResultDirMods+"/"+stringModId, stringModId, ch)
-					fmt.Println("ModId " + stringModId + " скопирован")
-				}
 			}
 		}
 	}
+}
+
+func (c *CollectorPzMods) CopyModes() {
+	infoChannel := make(chan string)
+
+	for _, modInfo := range c.Params.CopyInfo {
+		pathCopyMode := c.ConfigData.ResultDirMods + "/" + modInfo.ModId
+		go c.CopyMode(modInfo.PathMode, pathCopyMode, modInfo.ModId, infoChannel)
+	}
 
 	count := len(c.Params.ModIds)
-	for value := range ch {
-		fmt.Println(value + " скопирован!")
+
+	for modeName := range infoChannel {
+		fmt.Println(modeName + " скопирован!")
 		count -= 1
 		if count == 0 {
-			close(ch)
+			close(infoChannel)
 		}
 	}
 }

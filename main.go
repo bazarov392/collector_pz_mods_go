@@ -12,11 +12,13 @@ func main() {
 		Params: collector.ResultParams{
 			WorkshopIds: make([]string, 0),
 			ModIds:      make([]string, 0),
+			CopyInfo:    make([]collector.ModInfo, 0),
 		},
 	}
 
 	collect.GetWorkshopIds()
 	collect.GetModIds()
+	collect.CopyModes()
 	collect.GenerateFileModAndWorkshopIds()
 
 }
