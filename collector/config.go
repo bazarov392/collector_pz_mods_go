@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const PathToConfigFile = "/tmp/collectorPzModsForMautConfig"
+const PathToConfigFile = "collectorPzModsForMautConfig.json"
 
 type Config struct {
 	SteamDirMods         string

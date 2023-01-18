@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"golang-app/collector"
 )
 
@@ -21,4 +22,7 @@ func main() {
 	collect.CopyModes()
 	collect.GenerateFileModAndWorkshopIds()
 
+	fmt.Println("Для закрытия нажмите ENTER")
+	var end string
+	fmt.Scanf("%s\n", &end)
 }
